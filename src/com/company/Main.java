@@ -1,5 +1,9 @@
 package com.company;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -9,48 +13,58 @@ import java.util.Scanner;
 public class Main {
     public static Bank bank;
     public static User user;
+    static   List <User> users = new ArrayList<>();
+    static List<Trancation> trancationsList = new ArrayList<>();
+    static double courseDollar = 86;
 
     public static void main(String[] args) {
+        List <Account> accaountt = new ArrayList<>();
 
 
-        List<User> userList = new ArrayList<>();
 
-        User danil = new User("Данил", "Данилов", "danil", "danil123");
-        userList.add(new User("Данил", "Данилов", "danil", "danil123"));
-        userList.add(new User("Саша", "Сашиев", "sasha", "sasha123"));
-        userList.add(new User("Светлана", "Андреева", "sveta", "sveta123"));
-        userList.add(new User("Юсуф", "Салижанов", "yusuf", "yusuf123"));
-
-        List<Account> accountList = new ArrayList<>();
-
-        Account danilKgz = new Account("kgz", danil);
-        Account danilUsd = new Account("usd", danil);
         List<Account> danilAccountList = new ArrayList<>();
+        User danil = new User("Данил", "Данилов", "14", "1",danilAccountList );
+        Account danilKgz = new Account(11,5000,"kgz", danil );
+        Account danilUsd = new Account(22,5000,"usd", danil);
         danilAccountList.add(danilKgz);
         danilAccountList.add(danilUsd);
-        danil.setAccontList(danilAccountList);
+        accaountt.addAll(danilAccountList);
+        users.add(danil);
 
-        accountList.add(danilKgz);
-        accountList.add(danilUsd);
-        userList.add(danil);
+        List<Account> sashaAccountList = new ArrayList<>();
+        User sasha = new User("Саша", "Сашиев", "1", "1", sashaAccountList);
+        Account sashaKgz = new Account(33,13000,"kgz", sasha);
+        Account sashaUsd = new Account(44,15000,"usd", sasha);
+        sashaAccountList.add(sashaKgz);
+        sashaAccountList.add(sashaUsd);
+        accaountt.addAll(sashaAccountList);
+        users.add(sasha);
 
-//        accountList.add(new Account("kgz", userList.get(0)));
-//        accountList.add(new Account("usd", userList.get(0)));
-        accountList.add(new Account("kgz", userList.get(1)));
-        accountList.add(new Account("usd", userList.get(1)));
-        accountList.add(new Account("kgz", userList.get(2)));
-        accountList.add(new Account("usd", userList.get(2)));
-        accountList.add(new Account("kgz", userList.get(3)));
-        accountList.add(new Account("usd", userList.get(3)));
+        List<Account> ivanAccountList = new ArrayList<>();
+        User ivan = new User("Иван", "Иванов", "3", "3",ivanAccountList );
+        Account ivanKgz = new Account(66,37000,"kgz", ivan);
+        Account ivanUsd = new Account(77,35000,"usd", ivan);
+        ivanAccountList.add(ivanKgz);
+        ivanAccountList.add(ivanUsd);
+        accaountt.addAll(ivanAccountList);
+        users.add(ivan);
 
-        bank = new Bank("Demir",userList, accountList);
-        user = new User();
 
-        User.privetstviye();
+
+
+
+
+
+        bank = new Bank("Demir",users, accaountt, trancationsList);
+
+
+        readingFile();
+        User.voyti();
 //        Main();
 
 
-    }
+
+           }
 
 
     static void Main() {
@@ -63,6 +77,7 @@ public class Main {
             System.out.println("3. Вывести деньги");
             System.out.println("4. Отправить деньги");
             System.out.println("5. История действий");
+            System.out.println("6. Сохранить и выйти");
             try {
                 int deystviye = scanner.nextInt();
                 switch (deystviye) {
@@ -79,55 +94,78 @@ public class Main {
                         Bank.transferMoney();
                         break;
                     case 5:
-                        Trancation.trancationHistory();
-
+                        Account.getAllTransaction();
                         break;
+                    case 6:
+                        savingData();
+
+
                 }
 
 
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("Ошибка! Повторите попытку!");
             }
         }
 
     }
-//    private static void login(List <User> userlog) {
-//        Scanner scanner = new Scanner(System.in);
-//        int count = 0;
-//        while (true){
-//            try {
-//                System.out.println( "Введите ваш логин: ");
-//                String dlyaLogin = scanner.nextLine();
-//                System.out.println("Введите ваш пароль: ");
-//                String dlyaPassword = scanner.nextLine();
-//                while (true){
-//                    for (User r: userlog.get()) {
-//                        if(r.getLogin().equals(dlyaLogin) && r.getPassword().equals(dlyaPassword)){
-//                            System.out.println("Здравствуйте, " + r.getName() + "! ");
-//                            System.out.println("-----------------------------------");
-//                            loggedReader = r;
-//                            mainMenu();
-//                        }
-//
-//                    }
-//                    if (count < 2){
-//                        count++;
-//                        System.out.println("Неправильный логин или пароль! У вас осталось " + (3 -count) + " попыток");
-//                        System.out.println("Введите ваш логин:");
-//                        dlyaLogin = scanner.nextLine();
-//                        System.out.println("Введите ваш пароль:");
-//                        dlyaPassword = scanner.nextLine();
-//                    } else {
-//                        System.out.println("Не верно введенные данные: 3 раза. Система закрывается");
-//                        System.exit(0);
-//                    }
-//                }
-//
-//            }catch (Exception e ){
-//                System.out.println("Неправильный формат ввода!");
-//            }
-//        }
 
+    static void restart() {
+        boolean d = false;
+        System.out.println("\n-*-*-*-*-*-*-*-*-*-*-*-Нажмите любое число чтобы перейти в гланое меню:-*-*-*-*-*-*-*-*-*-*-*-");
+        System.out.println("-*-*-*-*-*-*-*-*-*-*-*-Нажмите 0 чтобы завершит процесс и сохранит изминение:-*-*-*-*-*-*-*-*-*-*-*-");
+        while (true) {
+            try {
+                Scanner scanner = new Scanner(System.in);
+                int b = scanner.nextInt();
+                if (b == 0) {
+                    savingData();
+
+                }
+                d = true;
+                Main();
+                break;
+
+
+            } catch (Exception e) {
+                System.err.println("\n-*-*-*-*-*-*-*-*-*-*-*-Нажмите любое ЧИСЛО чтобы перейти в гланое меню!!!-*-*-*-*-*-*-*-*-*-*-*-");
+            }
+            if (d) {
+                break;
+            }
+        }
+    }
+
+
+    private static void savingData() {
+        try {
+            ObjectOutputStream ois = new ObjectOutputStream(new FileOutputStream("Bank"));
+            ois.writeObject(bank);
+            ois.close();
+            System.exit(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Запись не удалась");
+
+        }
+
+
+    }
+
+    private static void readingFile() {
+        try {
+            ObjectInputStream oos = new ObjectInputStream(new FileInputStream("Bank"));
+            bank = (Bank) oos.readObject();
+            oos.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Не удалось прочитать файл!!!");
+        }
+
+    }
 
     }
 
